@@ -4,15 +4,23 @@ import "./index.css";
 import App from "./App";
 import Login from "./pages/Login";
 import SignUp from "./pages/Signup";
-import { BrowserRouter, Route } from "react-router-dom";
+import NotFound from "./pages/NotFound";
+import Watch from "./pages/watch";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
 import * as serviceWorker from "./serviceWorker";
-
+import Profile from "./pages/Home";
 const Router = () => {
   return (
     <BrowserRouter>
-      <Route path="/" exact component={App} />
-      <Route path="/login" component={Login} />
-      <Route path="/signup" component={SignUp} />
+      <Switch>
+        <Route path="/login" component={Login} />
+        <Route path="/signup" component={SignUp} />
+        <Route path="/" exact component={App} />
+        <Route path="/d" component={Profile} />
+        <Route path="/watch" component={Watch} />
+        {/** NOTHING ELSE SHOULD GO BELOW THIS LINE.*/}
+        <Route path="*" component={NotFound} />
+      </Switch>
     </BrowserRouter>
   );
 };
