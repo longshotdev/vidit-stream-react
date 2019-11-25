@@ -25,17 +25,17 @@ export default ({ component: Component, ...rest }) => {
         console.error("couldnt login");
         setLoggedIn(false);
       });
-  });
+  }, []);
   return (
     <Route
       {...rest}
       render={props =>
         localStorage.getItem("jwt") ? (
-          <Component {...props} />
-        ) : (
           <Redirect
             to={{ pathname: "/login", state: { from: props.location } }}
           />
+        ) : (
+          <Component {...props} />
         )
       }
     />

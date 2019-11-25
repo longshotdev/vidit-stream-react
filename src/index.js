@@ -2,29 +2,21 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
-import Login from "./pages/Login";
-import SignUp from "./pages/Signup";
-import NotFound from "./pages/NotFound";
-import Watch from "./pages/watch";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
 import * as serviceWorker from "./serviceWorker";
-import Profile from "./pages/Home";
-const Router = () => {
+import { Provider } from "react-redux";
+import { store, persistor } from "./redux/helpers/store";
+import { PersistGate } from "redux-persist/lib/integration/react";
+
+const WontonWrapper = () => {
   return (
-    <BrowserRouter>
-      <Switch>
-        <Route path="/login" component={Login} />
-        <Route path="/signup" component={SignUp} />
-        <Route path="/" exact component={App} />
-        <Route path="/d" component={Profile} />
-        <Route path="/watch" component={Watch} />
-        {/** NOTHING ELSE SHOULD GO BELOW THIS LINE.*/}
-        <Route path="*" component={NotFound} />
-      </Switch>
-    </BrowserRouter>
+    <Provider store={store}>
+      <PersistGate persistor={persistor}>
+        <App />
+      </PersistGate>
+    </Provider>
   );
 };
-ReactDOM.render(<Router />, document.getElementById("root"));
+ReactDOM.render(<WontonWrapper />, document.getElementById("root"));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
