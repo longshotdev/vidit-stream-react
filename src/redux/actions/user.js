@@ -7,6 +7,7 @@ export const userActions = {
   login,
   logout,
   register,
+  changeAvatar,
   getAll,
   delete: _delete
 };
@@ -18,7 +19,7 @@ function login(username, password) {
     userService.login(username, password).then(
       user => {
         dispatch(success(user));
-        history.push("/");
+        history.push("/profile");
       },
       error => {
         dispatch(failure(error.toString()));
@@ -40,9 +41,27 @@ function login(username, password) {
 
 function logout() {
   userService.logout();
+  history.push("/logout");
   return { type: userConstants.LOGOUT };
 }
-
+function changeAvatar(user, url) {
+  return dispatch => {
+    dispatch(request(user));
+    userService.changeAvatar(user, url).then(_user => {
+      dispatch(success(_user));
+      dispatch(alertActions.success("Chaged Avatar successful"));
+    });
+  };
+  function request(user) {
+    return { type: userConstants.CHANGE_AVATAR_REQUEST, user };
+  }
+  function success(user) {
+    return { type: userConstants.CHANGE_AVATAR_SUCCCESS, user };
+  }
+  function failure(error) {
+    return { type: userConstants.CHANGE_AVATAR_FAILURE, error };
+  }
+}
 function register(user) {
   return dispatch => {
     dispatch(request(user));

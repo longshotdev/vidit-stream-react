@@ -3,7 +3,8 @@ import axios from "axios";
 export const userService = {
   login,
   logout,
-  register
+  register,
+  changeAvatar
 };
 
 function login(username, password) {
@@ -43,21 +44,59 @@ function logout() {
   // remove user from local storage to log user out
   localStorage.removeItem("user");
 }
+
 function register(user) {
-  const requestOptions = {
+  const reqOpt = {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(user)
+    url: "/api/users/signup",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    data: {
+      username: user.username,
+      password: user.password
+    }
   };
-
-  return fetch(`/users/register`, requestOptions).then(handleResponse);
+  console.log("registering");
+  return axios(reqOpt)
+    .then(handleResponse)
+    .catch(error => console.log(error));
 }
-
-// prefixed function name with underscore because delete is a reserved word in javascript
-
+function changeAvatar(user, url) {
+  let { token } = user;
+  let { id } = user.user;
+  console.log(token);
+  const reqOpt = {
+    method: "PUT",
+    url: "/api/users/changeAvatar",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token
+    },
+    data: {
+      id: id,
+      url: url
+    }
+  };
+  console.log("chaning avatar");
+  return axios(reqOpt)
+    .then(d => {
+      let userData = handleResponse(d);
+      console.log(userData);
+      return {
+        token: token,
+        user: userData
+      };
+    })
+    .catch(e => console.error(e));
+}
 function handleResponse(response) {
   console.log(response);
   if (response.status === 200) {
+    if (response.data.status === 11) {
+      // this means no authentication data.
+      return response.data.data;
+    }
     if (response.data) {
       let constructObject = {
         token: response.data.data.token,

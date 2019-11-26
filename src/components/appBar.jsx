@@ -5,11 +5,13 @@ import {
   Typography,
   Link,
   Button,
-  makeStyles
+  makeStyles,
+  Avatar
 } from "@material-ui/core";
 
 import { connect } from "react-redux";
 import { userActions } from "../redux/actions/user";
+import history from "../redux/helpers/history";
 const useStyles = makeStyles(theme => ({
   appBar: {
     borderBottom: `1px solid ${theme.palette.divider}`
@@ -43,6 +45,7 @@ const Component = ({ ...props }) => {
           color="inherit"
           noWrap
           className={classes.toolbarTitle}
+          onClick={() => history.push("/")}
         >
           Vidit Streaming
         </Typography>
@@ -63,14 +66,18 @@ const Component = ({ ...props }) => {
           >
             Stream
           </Link>
-          <Link
-            variant="button"
-            className={classes.link}
-            color="textPrimary"
-            href="/d"
-          >
-            Dashboard
-          </Link>
+          {user ? (
+            <Link
+              variant="button"
+              className={classes.link}
+              color="textPrimary"
+              href="/profile"
+            >
+              Profile
+            </Link>
+          ) : (
+            <></>
+          )}
         </nav>
         {!user ? (
           <Button
@@ -92,14 +99,8 @@ const SignedIn = ({ ...props }) => {
   const { user, lg } = props;
   return (
     <React.Fragment>
-      <img
-        src={user.avatar}
-        alt="profilepic"
-        height={64}
-        width={64}
-        style={{ borderRadius: "50%" }}
-      />
-      )<Button onClick={() => lg()}>Logout</Button>
+      <Avatar src={user.avatar} alt="profilepic" />
+      <Button onClick={() => lg()}>Logout</Button>
     </React.Fragment>
   );
 };

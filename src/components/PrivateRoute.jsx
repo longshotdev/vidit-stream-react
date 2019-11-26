@@ -1,43 +1,38 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+/*
+  im too fucking lazy to do shit so thats why its a class component instead of a functional one
+
+ */
+
+import React from "react";
 import { Route, Redirect } from "react-router-dom";
-export default ({ component: Component, ...rest }) => {
-  let [isLoggedin, setLoggedIn] = useState(false);
-  useEffect(() => {
-    console.log(localStorage.getItem("jwt"));
-    // Try to login and get the shit
-    axios({
-      method: "GET",
-      url: `/api/users/info/${localStorage.getItem("username")}`,
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("jwt")
-      }
-    })
-      .then(res => {
-        console.log(res.data.data);
-        if (res.status === 200) {
-          if (res.data) {
-            setLoggedIn(true);
-          }
-        }
-      })
-      .catch(e => {
-        console.error("couldnt login");
-        setLoggedIn(false);
-      });
-  });
+import { connect } from "react-redux";
+import { userActions } from "../redux/actions/user";
+const PrivateRoute = ({ component: Component,...rest,}) => {
   return (
-    <Route
-      {...rest}
-      render={props =>
-        localStorage.getItem("jwt") ? (
-          <Component {...props} />
-        ) : (
-          <Redirect
-            to={{ pathname: "/login", state: { from: props.location } }}
-          />
-        )
-      }
-    />
-  );
+  <Route
+    {...rest}
+    component={props => rest.user ? (
+        <Component {...props} />
+      ) : (
+        <Redirect
+          to={{ pathname: "/login", state: { from: props.location } }}
+        />
+      )
+    }
+  />
+)};
+function mapState(state) {
+  const { users, authentication } = state;
+  const { user } = authentication;
+  return { user, users };
+}
+
+const actionCreators = {
+  getUsers: userActions.getAll,
+  deleteUser: userActions.delete,
+  login: userActions.login,
+  logout: userActions.logout
 };
+
+const connectedHomePage = connect(mapState, actionCreators)(PrivateRoute);
+export default connectedHomePage;
