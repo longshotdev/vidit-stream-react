@@ -20,8 +20,16 @@ import ShowDate from "../../components/showDate";
 import { connect } from "react-redux";
 import { userActions } from "../../redux/actions/user";
 import AppBar from "../../components/appBar";
+import Footer from "../../components/Footer";
+import {
+  subscribeToChat,
+  getUsersInChat,
+  sendMessage,
+  authenticate
+} from "../../components/socketIOLib";
 
 const useStyles = makeStyles(theme => ({
+  root: {},
   focusvisible: {},
   bigAvatar: {
     width: 256,
@@ -36,6 +44,10 @@ const useStyles = makeStyles(theme => ({
       zIndex: 4,
       "& $edit": {
         display: "block"
+      },
+      "& $regularAvatar": {
+        opacity: "0.4",
+        filter: "alpha(opacity=40)" /* msie */
       }
     }
   },
@@ -57,13 +69,27 @@ const useStyles = makeStyles(theme => ({
     display: "none"
   }
 }));
-
+// "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwidXNlcklEIjoiNWRkOWJkNzVhZGQ2M2MzMTFjOGM3NDk1IiwiaWF0IjoxNTc0ODA0NzQyLCJleHAiOjE1NzQ4MDgzNDJ9.28uUPNncHUHG6pdoXRV9Cu2tHt9GlCiHoE6Tp155dJM"
 function App({ ...props }) {
   let [aURL, setAURL] = useState("");
   let [avatarOpen, setAvatarOpen] = useState(false);
   let [urlErrorBool, setURLErrorBool] = useState(false);
   let [urlError, setURLError] = useState("");
   let { user } = props.user;
+
+  // useEffect(() => {
+  //   authenticate(props.user, data => {
+  //     console.log(data);
+  //     setwsData(data);
+  //   });
+  //   getUsersInChat(d => console.log(d));
+  //   subscribeToChat(chatMessage => {
+  //     let temp = catte;
+  //     temp.push(chatMessage);
+  //     setC(temp);
+  //     console.log(catte);
+  //   });
+  // }, []);
 
   let updatedaURL = txt => {
     setAURL(txt);
@@ -95,7 +121,7 @@ function App({ ...props }) {
     <>
       <CssBaseline />
       <AppBar />
-      <Grid container>
+      <Grid container className={classes.root}>
         <Grid item xs={4}>
           <Avatar
             alt="Avatar"
@@ -107,7 +133,10 @@ function App({ ...props }) {
         </Grid>
         <Grid item xs={6}>
           <ShowDate>
-            <strong>{user.username}</strong>.
+            <strong onClick={() => sendMessage(props.user.token, "hi")}>
+              {user.username}
+            </strong>
+            .
           </ShowDate>
           <ButtonBase
             focusRipple
@@ -133,36 +162,19 @@ function App({ ...props }) {
             URL={aURL}
           />
           <Paper className={classes.paper}>
-            <Grid item xs={12} sm container>
-              <Grid item sm className={classes.inline}>
-                <Typography variant="h3">Change Avatar</Typography>
-                <Grid
-                  item
-                  sm
-                  alignItems="center"
-                  justify="space-evenly"
-                  container
-                >
-                  <Grid item xs={4}>
-                    <Input type="text" value="23232" />
-                    <Button onClick={() => alert(1)}>Hi</Button>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Avatar
-                      src={user.avatar}
-                      className={classes.regularAvatar}
-                    />
-                  </Grid>
-                </Grid>
-              </Grid>
-            </Grid>
+            <Typography
+              variant="h4"
+              onClick={() => getUsersInChat(users => console.log(users))}
+            >
+              Posts
+            </Typography>
           </Paper>
         </Grid>
       </Grid>
+      <Footer />
     </>
   );
 }
-
 function AvatarInputDialog({ ...props }) {
   return (
     <Dialog

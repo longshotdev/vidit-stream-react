@@ -32,7 +32,6 @@ const Router = ({ ...props }) => {
   }, []);
   const { enqueueSnackbar } = useSnackbar();
   let { alert } = props;
-  console.log(alert);
   if (alert.message) {
     enqueueSnackbar(alert.message, {
       variant: alert.type
@@ -46,8 +45,9 @@ const Router = ({ ...props }) => {
           <Route path="/login" component={Login} />
           <Route path="/signup" component={SignUp} />
           <Route path="/" exact component={App} />
-          <PrivateRoute path="/profile" component={Profile} />
-          <Route path="/watch" component={Watch} />
+          <PrivateRoute path="/profile" exact component={Profile} />
+          <PrivateRoute path="/watch" component={Watch} />
+          <Route path="/profile/:id" component={Login} />
           <Route path="/logout" render={() => <Redirect to="/" />} />
           {/** NOTHING ELSE SHOULD GO BELOW THIS LINE.*/}
           <Route path="*" component={NotFound} />
@@ -75,7 +75,7 @@ export default () => (
     ref={notistackRef}
     action={key => (
       <Button color="primary" onClick={onClickDismiss(key)}>
-        'Dismiss'
+        Dismiss
       </Button>
     )}
   >

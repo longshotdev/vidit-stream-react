@@ -36,7 +36,9 @@ function login(username, password) {
   console.log("YOU ARE NOW LOGGED IN.");
   return axios(reqOpt)
     .then(handleResponse)
-    .catch(error => console.log(error));
+    .catch(error => {
+      return Promise.reject("Wrong Username / Password.");
+    });
 }
 
 function logout() {
@@ -60,7 +62,7 @@ function register(user) {
   console.log("registering");
   return axios(reqOpt)
     .then(handleResponse)
-    .catch(error => console.log(error));
+    .catch(error => Promise.reject("el stupidido"));
 }
 function changeAvatar(user, url) {
   let { token } = user;
@@ -78,7 +80,6 @@ function changeAvatar(user, url) {
       url: url
     }
   };
-  console.log("chaning avatar");
   return axios(reqOpt)
     .then(d => {
       let userData = handleResponse(d);
@@ -88,7 +89,7 @@ function changeAvatar(user, url) {
         user: userData
       };
     })
-    .catch(e => console.error(e));
+    .catch(e => Promise.reject("Couldn't change avatar."));
 }
 function handleResponse(response) {
   console.log(response);
@@ -108,5 +109,6 @@ function handleResponse(response) {
   } else if (response.status === 400) {
     logout();
     window.location.reload(true);
+    return Promise.reject("Wrong Password.");
   }
 }

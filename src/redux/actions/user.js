@@ -42,15 +42,21 @@ function login(username, password) {
 function logout() {
   userService.logout();
   history.push("/logout");
-  return { type: userConstants.LOGOUT };
+  return dispatch => {
+    dispatch({ type: userConstants.LOGOUT });
+    dispatch(alertActions.success("Logged out!"));
+  };
 }
 function changeAvatar(user, url) {
   return dispatch => {
     dispatch(request(user));
-    userService.changeAvatar(user, url).then(_user => {
-      dispatch(success(_user));
-      dispatch(alertActions.success("Chaged Avatar successful"));
-    });
+    userService
+      .changeAvatar(user, url)
+      .then(_user => {
+        dispatch(success(_user));
+        dispatch(alertActions.success("Avatar Changed Successfully"));
+      })
+      .catch(e => dispatch(alertActions.error(failure(e.toString()))));
   };
   function request(user) {
     return { type: userConstants.CHANGE_AVATAR_REQUEST, user };

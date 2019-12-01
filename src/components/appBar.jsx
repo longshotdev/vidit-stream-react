@@ -6,7 +6,15 @@ import {
   Link,
   Button,
   makeStyles,
-  Avatar
+  Avatar,
+  ButtonBase,
+  Menu,
+  MenuItem,
+  ClickAwayListener,
+  MenuList,
+  Popper,
+  Grow,
+  Paper
 } from "@material-ui/core";
 
 import { connect } from "react-redux";
@@ -27,9 +35,6 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 const Component = ({ ...props }) => {
-  useEffect(() => {
-    console.log(props.user);
-  }, []);
   const { user } = props;
   const classes = useStyles();
   return (
@@ -66,18 +71,6 @@ const Component = ({ ...props }) => {
           >
             Stream
           </Link>
-          {user ? (
-            <Link
-              variant="button"
-              className={classes.link}
-              color="textPrimary"
-              href="/profile"
-            >
-              Profile
-            </Link>
-          ) : (
-            <></>
-          )}
         </nav>
         {!user ? (
           <Button
@@ -97,10 +90,91 @@ const Component = ({ ...props }) => {
 };
 const SignedIn = ({ ...props }) => {
   const { user, lg } = props;
+  const [open, setOpen] = React.useState(false);
+  const anchorRef = React.useRef(null);
+  const handleToggle = () => {
+    setOpen(prevOpen => !prevOpen);
+  };
+  const handleClose = (event, id) => {
+    if (anchorRef.current && anchorRef.current.contains(event.target)) {
+      return;
+    }
+    switch (id) {
+      case 1:
+        history.push("/profile");
+        break;
+      case 2:
+        history.push("/account");
+        break;
+      case 3:
+        lg();
+        history.push("/logout");
+        break;
+      default:
+        setOpen(false);
+        break;
+    }
+    setOpen(false);
+  };
+  function handleListKeyDown(event) {
+    if (event.key === "Tab") {
+      event.preventDefault();
+      setOpen(false);
+    }
+  }
+  const prevOpen = React.useRef(open);
+  React.useEffect(() => {
+    if (prevOpen.current === true && open === false) {
+      anchorRef.current.focus();
+    }
+
+    prevOpen.current = open;
+  }, [open]);
   return (
     <React.Fragment>
-      <Avatar src={user.avatar} alt="profilepic" />
-      <Button onClick={() => lg()}>Logout</Button>
+      <ButtonBase
+        style={{ borderRadius: "50%" }}
+        ref={anchorRef}
+        aria-controls={open ? "menu-list-grow" : undefined}
+        aria-haspopup="true"
+        onClick={handleToggle}
+      >
+        <Avatar src={user.avatar} alt="profilepic" />
+      </ButtonBase>
+      <Popper
+        open={open}
+        anchorEl={anchorRef.current}
+        role={undefined}
+        style={{ zIndex: 1000 }}
+        transition
+        disablePortal
+      >
+        {({ TransitionProps, placement }) => (
+          <Grow
+            {...TransitionProps}
+            style={{
+              transformOrigin:
+                placement === "bottom" ? "center top" : "center bottom"
+            }}
+          >
+            <Paper>
+              <ClickAwayListener onClickAway={handleClose}>
+                <MenuList
+                  autoFocusItem={open}
+                  id="menu-list-grow"
+                  onKeyDown={handleListKeyDown}
+                >
+                  <MenuItem onClick={e => handleClose(e, 1)}>Profile</MenuItem>
+                  <MenuItem onClick={e => handleClose(e, 2)}>
+                    My account
+                  </MenuItem>
+                  <MenuItem onClick={e => handleClose(e, 3)}>Logout</MenuItem>
+                </MenuList>
+              </ClickAwayListener>
+            </Paper>
+          </Grow>
+        )}
+      </Popper>
     </React.Fragment>
   );
 };
